@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      background: #fdf6fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      padding: 48px 36px 36px;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      animation: cardIn 0.4s ease;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .card-logo img {
+      width: 64px;
+      height: 64px;
+      opacity: 0.85;
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #E280BE;
+      letter-spacing: 0.5px;
+    }
+    .card-subtitle {
+      font-size: 12px;
+      color: #bbb;
+      font-weight: 400;
+    }
+
+    /* ── FILAS DE INPUT ── */
+    .card-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .card-row img.row-icon {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .card-row:focus-within img.row-icon { opacity: 1; }
+
+    .card-input {
+      flex: 1;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 30px;
+      padding: 10px 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      color: #aaa;
+      background: #f7f7f7;
+      outline: none;
+      transition: border 0.2s, color 0.2s;
+    }
+    .card-input:focus  { border-color: #E280BE; color: #555; }
+    .card-input.filled { color: #555; background: #fff; border-color: #e0e0e0; }
+
+    /* ── BOTÓN LOGIN ── */
+    .btn-login {
+      margin-top: 8px;
+      width: 100%;
+      padding: 11px;
+      border-radius: 30px;
+      border: none;
+      background: #E280BE;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-login:hover   { background: #d06aaa; transform: scale(1.02); }
+    .btn-login:active  { transform: scale(0.98); }
+    .btn-login:disabled { background: #e8b0d0; cursor: not-allowed; transform: none; }
+
+    /* ── OLVIDÉ CONTRASEÑA ── */
+    .forgot {
+      text-align: center;
+      font-size: 12px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .forgot:hover { color: #E280BE; }
+
+    /* ── FOOTER ── */
+    .footer {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 0;
+    }
+    .footer-icon { transition: opacity 0.2s, transform 0.2s; }
+    .footer-icon:hover { opacity: 1; transform: scale(1.05); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px rgba(220,80,150,0.18);
+      padding: 36px 32px 28px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .modal-icon  { font-size: 36px; margin-bottom: 12px; }
+    .modal-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600; font-size: 16px;
+      color: #444; margin-bottom: 10px;
+    }
+    .modal-msg {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; color: #999;
+      line-height: 1.6; margin-bottom: 24px;
+    }
+    .modal-btns { display: flex; justify-content: center; }
+    .modal-btn {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; padding: 8px 26px;
+      border-radius: 30px; cursor: pointer;
+      border: none; transition: background 0.2s;
+      background: #E280BE; color: #fff;
+    }
+    .modal-btn:hover { background: #d06aaa; }
+  </style>
+</head>
+<body>
+
+  <!-- TARJETA LOGIN -->
+  <div class="card">
+    <div class="card-logo">
+      <img src="Assets/Imagologo_motion.svg" alt="Logo" />
+      <span class="card-title">Bienvenido</span>
+      <span class="card-subtitle">Inicia sesión para continuar</span>
+    </div>
+
+    <div class="card-row">
+      <img src="Assets/Icon_persona.svg" alt="Usuario" class="row-icon" id="iconUsuario" />
+      <input class="card-input" id="inputUsuario" type="text" placeholder="Usuario" />
+    </div>
+
+    <div class="card-row">
+      <img src="Assets/icono_candado.png" alt="Contraseña" class="row-icon" id="iconPassword" />
+      <input class="card-input" id="inputPassword" type="password" placeholder="Contraseña" />
+    </div>
+
+    <button class="btn-login" id="btnLogin">Ingresar</button>
+
+    <p class="forgot" id="btnForgot">¿Olvidaste tu contraseña?</p>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalVacio">
+    <div class="modal-box">
+      <div class="modal-icon">⚠️</div>
+      <p class="modal-title" id="modalTitulo">Campos incompletos</p>
+      <p class="modal-msg"   id="modalMensaje">Por favor ingresa tu usuario y contraseña para continuar.</p>
+      <div class="modal-btns">
+        <button class="modal-btn" id="modalVacioOk">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+    <img src="Assets/Imagologotipo_motion.svg" alt="Footer" class="footer-icon" />
+  </footer>
+
+  <script>
+
+    // ════════════════════════════════════════════════════
+    // CONFIGURACIÓN API
+    // ════════════════════════════════════════════════════
+    const API_BASE_URL = 'https://backendgpscontrol.onrender.com';
+
+    // ── LOGIN (POST) ──
+    // Django REST Framework Simple JWT espera: { username, password }
+    // y retorna: { access: "eyJ...", refresh: "eyJ..." }
+    async function apiLogin(payload) {
+      const response = await fetch(`${API_BASE_URL}/api/token/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.status === 401) {
+        showCredencialesError();
+        throw new Error('Credenciales incorrectas');
+      }
+      if (!response.ok) throw new Error('Error del servidor');
+      return await response.json();
+    }
+
+    // ════════════════════════════════════════════════════
+    // REFERENCIAS DOM
+    // ════════════════════════════════════════════════════
+    const inputUsuario  = document.getElementById('inputUsuario');
+    const inputPassword = document.getElementById('inputPassword');
+    const btnLogin      = document.getElementById('btnLogin');
+    const modalVacio    = document.getElementById('modalVacio');
+    const modalVacioOk  = document.getElementById('modalVacioOk');
+    const btnForgot     = document.getElementById('btnForgot');
+
+    function showModal(el) { el.classList.add('show'); }
+    function hideModal(el) { el.classList.remove('show'); }
+
+    function camposValidos() {
+      return inputUsuario.value.trim() !== '' && inputPassword.value.trim() !== '';
+    }
+
+    // ── Activar icono al escribir ──
+    [inputUsuario, inputPassword].forEach(inp => {
+      inp.addEventListener('input', () => {
+        inp.classList.toggle('filled', inp.value.trim() !== '');
+      });
+    });
+
+    // ── Si ya hay sesión activa, saltar el login ──
+    if (localStorage.getItem('token')) {
+      window.location.href = 'tabla.html';
+    }
+
+    // ── Botón ingresar ──
+    btnLogin.addEventListener('click', async () => {
+      if (!camposValidos()) { showModal(modalVacio); return; }
+
+      // Django REST Framework Simple JWT usa "username", no "usuario"
+      const payload = {
+        username: inputUsuario.value.trim(),
+        password: inputPassword.value.trim()
+      };
+
+      btnLogin.disabled    = true;
+      btnLogin.textContent = 'Ingresando...';
+
+      try {
+        const session = await apiLogin(payload);
+
+        // Django retorna "access" y "refresh", no "token"
+        localStorage.setItem('token',   session.access);   // token de uso en cada petición
+        localStorage.setItem('refresh', session.refresh);  // token para renovar cuando expire
+
+        // Redirigir al CRUD
+        window.location.href = 'tabla.html';
+
+      } catch (err) {
+        console.error('Error al iniciar sesión:', err);
+        btnLogin.disabled    = false;
+        btnLogin.textContent = 'Ingresar';
+      }
+    });
+
+    // ── Enter para hacer login ──
+    [inputUsuario, inputPassword].forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') btnLogin.click();
+      });
+    });
+
+    // ── Cerrar modal y restaurar texto ──
+    modalVacioOk.addEventListener('click', () => {
+      hideModal(modalVacio);
+      document.getElementById('modalTitulo').textContent  = 'Campos incompletos';
+      document.getElementById('modalMensaje').textContent = 'Por favor ingresa tu usuario y contraseña para continuar.';
+    });
+
+    // ── Modal de credenciales incorrectas ──
+    function showCredencialesError() {
+      document.getElementById('modalTitulo').textContent  = 'Credenciales incorrectas';
+      document.getElementById('modalMensaje').textContent = 'El usuario o la contraseña son incorrectos. Inténtalo de nuevo.';
+      showModal(modalVacio);
+    }
+
+    btnForgot.addEventListener('click', () => {
+      // ── CONECTAR lógica de recuperación ──
+      console.log('Recuperar contraseña');
+    });
+
+  </script>
+
+</body>
+</html>

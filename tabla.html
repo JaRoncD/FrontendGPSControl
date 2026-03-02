@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Aspirantes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      background: #fdf6fb;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 40px;
+      gap: 24px;
+    }
+
+    .card-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ── CARD ── */
+    .card {
+      width: 100%;
+      max-width: 380px;
+      transform: scale(1.2);
+      transform-origin: top center;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      padding: 28px 20px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: scale(1.3); }
+
+    .card-add {
+      position: absolute;
+      top: 14px; left: 14px;
+      width: 20px; height: 20px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .card-add:hover { transform: scale(1.2); }
+
+    .card-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .card-row img.row-icon {
+      width: 28px; height: 28px;
+      flex-shrink: 0;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .card-row img.row-icon.activo { opacity: 1; }
+
+    .card-input {
+      flex: 1;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 30px;
+      padding: 10px 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      color: #aaa;
+      background: #f7f7f7;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .card-input:focus  { border-color: #20c4d6; color: #555; }
+    .card-input.filled { color: #555; background: #fff; border-color: #e0e0e0; }
+
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      height: 0;
+      overflow: hidden;
+    }
+    .card-actions.visible { opacity: 1; pointer-events: all; height: auto; overflow: visible; }
+    .card-actions img {
+      width: 32px; height: 32px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .card-actions img:hover { transform: scale(1.15); }
+
+    .card-actions-crear {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      height: 0;
+      overflow: hidden;
+    }
+    .card-actions-crear.visible { opacity: 1; pointer-events: all; height: auto; overflow: visible; }
+
+    .btn-cancelar-crear, .btn-crear {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      padding: 7px 22px;
+      border-radius: 30px;
+      cursor: pointer;
+      background: #fff;
+      transition: background 0.2s;
+    }
+    .btn-cancelar-crear { color: #e8589e; border: 1.5px solid #E280BE; }
+    .btn-cancelar-crear:hover { background: #fdf0f8; }
+    .btn-crear { color: #20c4d6; border: 1.5px solid #20c4d6; }
+    .btn-crear:hover { background: #f0fbfc; }
+
+    /* ── MODALES ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px rgba(220,80,150,0.18);
+      padding: 36px 32px 28px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .modal-icon { font-size: 36px; margin-bottom: 12px; }
+    .modal-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600; font-size: 16px;
+      color: #444; margin-bottom: 10px;
+    }
+    .modal-msg {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; color: #999;
+      line-height: 1.6; margin-bottom: 24px;
+    }
+    .modal-btns { display: flex; justify-content: center; gap: 12px; }
+    .modal-btn {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; padding: 8px 26px;
+      border-radius: 30px; cursor: pointer;
+      border: none; transition: background 0.2s;
+    }
+    .modal-btn-primary { background: #E280BE; color: #fff; }
+    .modal-btn-primary:hover { background: #d06aaa; }
+    .modal-btn-cancel  { background: #fff; color: #999; border: 1.5px solid #ddd; }
+    .modal-btn-cancel:hover  { background: #f5f5f5; }
+    .modal-btn-danger  { background: #E280BE; color: #fff; }
+    .modal-btn-danger:hover  { background: #d06aaa; }
+
+    .table-outer {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ── TABLA ── */
+    .table-wrapper {
+      width: 100%;
+      max-width: 600px;
+      transform: scale(1.2);
+      transform-origin: top center;
+      background: #fff;
+      border-radius: 0 0 16px 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(220,80,150,0.10);
+    }
+    .table-scroll { max-height: 450px; overflow-y: auto; }
+    .table-scroll::-webkit-scrollbar { width: 5px; }
+    .table-scroll::-webkit-scrollbar-track { background: #fdf6fb; }
+    .table-scroll::-webkit-scrollbar-thumb { background: #e8b0d0; border-radius: 10px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #E280BE; }
+    thead th {
+      color: #fff;
+      font-weight: 400;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      padding: 8px 20px;
+      text-align: center;
+      letter-spacing: 0.3px;
+      border: 7px solid white;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    thead th:first-child { border-left: none; }
+    thead th:last-child  { border-right: none; }
+    thead tr             { border-top: none; }
+
+    tbody tr {
+      border-bottom: 2px solid #f5d0e8;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    tbody tr:last-child   { border-bottom: none; }
+    tbody tr:hover        { background: #fdf0f8; }
+    tbody tr.selected-row { background: #fce8f3; }
+
+    tbody td {
+      padding: 6px 20px;
+      font-size: 14px;
+      color: #b0779a;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+    }
+
+    .actions { display: flex; align-items: center; gap: 10px; }
+    .actions img {
+      width: 26px; height: 26px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .actions img:hover { transform: scale(1.15); }
+
+    @keyframes fadeOutRow {
+      0%   { opacity: 1; transform: scaleY(1); max-height: 100px; }
+      100% { opacity: 0; transform: scaleY(0); max-height: 0; padding: 0; }
+    }
+    .row-removing {
+      animation: fadeOutRow 0.35s ease forwards;
+      transform-origin: top;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 0;
+    }
+    .footer-icon { transition: opacity 0.2s, transform 0.2s; }
+    .footer-icon:hover { opacity: 1; transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+  <!-- TARJETA IZQUIERDA -->
+  <div class="card-wrapper">
+  <div class="card" id="card">
+    <img src="Assets/Icon_crear.svg" alt="Agregar" class="card-add" id="cardAdd" />
+
+    <div class="card-row" style="margin-top:14px;">
+      <img id="iconMarca" src="Assets/Icon_vehiculo.svg" alt="Marca" class="row-icon" />
+      <input class="card-input" id="inputMarca" type="text" placeholder="Marca" />
+    </div>
+    <div class="card-row">
+      <img id="iconSucursal" src="Assets/Icon_puntoubicacion.svg" alt="Sucursal" class="row-icon" />
+      <input class="card-input" id="inputSucursal" type="text" placeholder="Sucursal" />
+    </div>
+    <div class="card-row">
+      <img id="iconAspirante" src="Assets/Icon_persona.svg" alt="Aspirante" class="row-icon" />
+      <input class="card-input" id="inputAspirante" type="text" placeholder="Aspirante" />
+    </div>
+
+    <div class="card-actions" id="cardActions">
+      <img src="Assets/Icon_cancelar.svg"  alt="Cancelar"  id="btnCancelar" />
+      <img src="Assets/Icon_confirmar.svg" alt="Confirmar" id="btnConfirmar" />
+    </div>
+
+    <div class="card-actions-crear" id="cardActionsCrear">
+      <button class="btn-cancelar-crear" id="btnCancelarCrear">Cancelar</button>
+      <button class="btn-crear"          id="btnCrear">Crear</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- TABLA DERECHA -->
+  <div class="table-outer">
+    <div class="table-wrapper">
+      <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
+        <colgroup>
+          <col style="width:28%"/>
+          <col style="width:28%"/>
+          <col style="width:44%"/>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Marca</th>
+            <th>Sucursal</th>
+            <th>Aspirante</th>
+          </tr>
+        </thead>
+      </table>
+      <div class="table-scroll">
+        <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
+          <colgroup>
+            <col style="width:28%"/>
+            <col style="width:28%"/>
+            <col style="width:44%"/>
+          </colgroup>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CAMPOS VACÍOS -->
+  <div class="modal-overlay" id="modalVacio">
+    <div class="modal-box">
+      <div class="modal-icon">⚠️</div>
+      <p class="modal-title">Campos incompletos</p>
+      <p class="modal-msg">Por favor completa todos los campos antes de continuar.</p>
+      <div class="modal-btns">
+        <button class="modal-btn modal-btn-primary" id="modalVacioOk">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR ELIMINAR -->
+  <div class="modal-overlay" id="modalEliminar">
+    <div class="modal-box">
+      <div class="modal-icon">🗑️</div>
+      <p class="modal-title">¿Eliminar registro?</p>
+      <p class="modal-msg">Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar esta fila?</p>
+      <div class="modal-btns">
+        <button class="modal-btn modal-btn-cancel" id="modalEliminarNo">Cancelar</button>
+        <button class="modal-btn modal-btn-danger" id="modalEliminarSi">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+    <img src="Assets/Imagologotipo_motion.svg" alt="Footer" class="footer-icon" />
+  </footer>
+
+  <script>
+
+    // ════════════════════════════════════════════════════
+    // JWT — PROTECCIÓN DE PÁGINA
+    // Si no hay token, redirige al login
+    // ════════════════════════════════════════════════════
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    // ════════════════════════════════════════════════════
+    // CONFIGURACIÓN API
+    // ════════════════════════════════════════════════════
+    const API_BASE_URL = 'https://backendgpscontrol.onrender.com';
+
+    // ── Helper: headers con JWT ──
+    function authHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      };
+    }
+
+    // ── Helper: manejar respuesta 401 (token expirado) ──
+    function handleUnauthorized(response) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh');
+        window.location.href = 'login.html';
+        return true;
+      }
+      return false;
+    }
+
+    // ════════════════════════════════════════════════════
+    // FUNCIONES API (CRUD) — CON JWT
+    // ════════════════════════════════════════════════════
+
+    // READ → GET /api/registros/
+    async function apiObtenerTodos() {
+      const response = await fetch(`${API_BASE_URL}/api/registros/`, {
+        headers: authHeaders()
+      });
+      if (handleUnauthorized(response)) return;
+      if (!response.ok) throw new Error('Error al obtener registros');
+      return await response.json();
+    }
+
+    // CREATE → POST /api/registros/
+    // payload = { marca, sucursal, aspirante }
+    async function apiCrear(payload) {
+      const response = await fetch(`${API_BASE_URL}/api/registros/`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (handleUnauthorized(response)) return;
+      if (!response.ok) throw new Error('Error al crear');
+      return await response.json();
+    }
+
+    // UPDATE → PUT /api/registros/:id/
+    // payload = { marca, sucursal, aspirante }
+    async function apiActualizar(id, payload) {
+      const response = await fetch(`${API_BASE_URL}/api/registros/${id}/`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (handleUnauthorized(response)) return;
+      if (!response.ok) throw new Error('Error al actualizar');
+      return await response.json();
+    }
+
+    // DELETE → DELETE /api/registros/:id/
+    async function apiEliminar(id) {
+      const response = await fetch(`${API_BASE_URL}/api/registros/${id}/`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+      if (handleUnauthorized(response)) return;
+      if (!response.ok) throw new Error('Error al eliminar');
+      return true;
+    }
+
+    // ── Cerrar sesión ──
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh');
+      window.location.href = 'login.html';
+    }
+
+    // ════════════════════════════════════════════════════
+    // REFERENCIAS DOM
+    // ════════════════════════════════════════════════════
+    const tbody            = document.getElementById('tableBody');
+    const cardActions      = document.getElementById('cardActions');
+    const cardActionsCrear = document.getElementById('cardActionsCrear');
+    const inputMarca       = document.getElementById('inputMarca');
+    const inputSucursal    = document.getElementById('inputSucursal');
+    const inputAspirante   = document.getElementById('inputAspirante');
+    const iconMarca        = document.getElementById('iconMarca');
+    const iconSucursal     = document.getElementById('iconSucursal');
+    const iconAspirante    = document.getElementById('iconAspirante');
+    const btnCancelar      = document.getElementById('btnCancelar');
+    const btnConfirmar     = document.getElementById('btnConfirmar');
+    const btnCancelarCrear = document.getElementById('btnCancelarCrear');
+    const btnCrear         = document.getElementById('btnCrear');
+    const cardAdd          = document.getElementById('cardAdd');
+    const modalVacio       = document.getElementById('modalVacio');
+    const modalEliminar    = document.getElementById('modalEliminar');
+    const modalVacioOk     = document.getElementById('modalVacioOk');
+    const modalEliminarNo  = document.getElementById('modalEliminarNo');
+    const modalEliminarSi  = document.getElementById('modalEliminarSi');
+
+    const allInputs = [inputMarca, inputSucursal, inputAspirante];
+    const allIcons  = [
+      { el: iconMarca,     def: 'Assets/Icon_vehiculo.svg',       act: 'Assets/Icon_vehiculo1.svg'       },
+      { el: iconSucursal,  def: 'Assets/Icon_puntoubicacion.svg', act: 'Assets/Icon_puntoubicacion1.svg' },
+      { el: iconAspirante, def: 'Assets/Icon_persona.svg',        act: 'Assets/Icon_persona1.svg'        },
+    ];
+
+    let selectedRow     = null;
+    let selectedRowId   = null;
+    let modoAgregar     = false;
+    let pendingDeleteTr = null;
+    let pendingDeleteId = null;
+
+    // ════════════════════════════════════════════════════
+    // HELPERS UI
+    // ════════════════════════════════════════════════════
+    function activarIconos()    { allIcons.forEach(({ el, act }) => { el.src = act; el.classList.add('activo'); }); }
+    function desactivarIconos() { allIcons.forEach(({ el, def }) => { el.src = def; el.classList.remove('activo'); }); }
+    function limpiarCampos()    { allInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); }); }
+    function camposValidos()    { return allInputs.every(inp => inp.value.trim() !== ''); }
+    function showModal(el)      { el.classList.add('show'); }
+    function hideModal(el)      { el.classList.remove('show'); }
+
+    function llenarCampos(row) {
+      inputMarca.value     = row.marca;
+      inputSucursal.value  = row.sucursal;
+      inputAspirante.value = row.aspirante;
+      allInputs.forEach(inp => inp.classList.add('filled'));
+    }
+
+    function getFormValues() {
+      return {
+        marca:     inputMarca.value.trim(),
+        sucursal:  inputSucursal.value.trim(),
+        aspirante: inputAspirante.value.trim()
+      };
+    }
+
+    function bindDeleteBtn(tr) {
+      tr.querySelector('.btn-eliminar').addEventListener('click', (e) => {
+        e.stopPropagation();
+        pendingDeleteTr = tr;
+        pendingDeleteId = tr.dataset.id;
+        showModal(modalEliminar);
+      });
+    }
+
+    function setTableIcons(activeTr) {
+      document.querySelectorAll('#tableBody tr').forEach(tr => {
+        const imgs = tr === activeTr
+          ? ['Assets/icon_editar1.svg',  'Assets/Icon_eliminar1.svg']
+          : ['Assets/icon_editar.svg',   'Assets/Icon_eliminar.svg'];
+        tr.querySelector('.actions').innerHTML =
+          `<img src="${imgs[0]}" alt="Editar"   class="btn-editar"/>
+           <img src="${imgs[1]}" alt="Eliminar" class="btn-eliminar"/>`;
+        bindDeleteBtn(tr);
+      });
+    }
+
+    function restoreTableIcons() {
+      document.querySelectorAll('#tableBody tr').forEach(tr => {
+        tr.querySelector('.actions').innerHTML =
+          `<img src="Assets/icon_editar1.svg"   alt="Editar"   class="btn-editar"/>
+           <img src="Assets/icon_eliminar1.svg" alt="Eliminar" class="btn-eliminar"/>`;
+        bindDeleteBtn(tr);
+      });
+    }
+
+    function clearSelection() {
+      if (selectedRow) { selectedRow.classList.remove('selected-row'); selectedRow = null; }
+      selectedRowId = null;
+      restoreTableIcons();
+      limpiarCampos();
+      desactivarIconos();
+      cardActions.classList.remove('visible');
+    }
+
+    function salirModoAgregar() {
+      modoAgregar = false;
+      limpiarCampos();
+      desactivarIconos();
+      cardActionsCrear.classList.remove('visible');
+    }
+
+    // ════════════════════════════════════════════════════
+    // ACCIONES CRUD
+    // ════════════════════════════════════════════════════
+
+    // ── AGREGAR (icono +) ──
+    cardAdd.addEventListener('click', () => {
+      if (modoAgregar) { salirModoAgregar(); return; }
+      clearSelection();
+      modoAgregar = true;
+      activarIconos();
+      cardActionsCrear.classList.add('visible');
+    });
+
+    btnCancelarCrear.addEventListener('click', salirModoAgregar);
+
+    // ── CREAR (POST) ──
+    btnCrear.addEventListener('click', async () => {
+      if (!camposValidos()) { showModal(modalVacio); return; }
+      const payload = getFormValues();
+      try {
+        const nuevo = await apiCrear(payload);
+        if (nuevo) agregarFilaTabla(nuevo);
+        salirModoAgregar();
+      } catch (err) {
+        console.error('Error al crear:', err);
+      }
+    });
+
+    // ── MODIFICAR (PUT) ──
+    btnCancelar.addEventListener('click', clearSelection);
+
+    btnConfirmar.addEventListener('click', async () => {
+      if (!camposValidos()) { showModal(modalVacio); return; }
+      const payload = getFormValues();
+      try {
+        await apiActualizar(selectedRowId, payload);
+        if (selectedRow) {
+          const celdas = selectedRow.querySelectorAll('td');
+          celdas[0].textContent = payload.marca;
+          celdas[1].textContent = payload.sucursal;
+          celdas[2].querySelector('span').textContent = payload.aspirante;
+        }
+        clearSelection();
+      } catch (err) {
+        console.error('Error al actualizar:', err);
+      }
+    });
+
+    // ── ELIMINAR (DELETE) ──
+    modalVacioOk.addEventListener('click',    () => hideModal(modalVacio));
+    modalEliminarNo.addEventListener('click', () => hideModal(modalEliminar));
+
+    modalEliminarSi.addEventListener('click', async () => {
+      hideModal(modalEliminar);
+      try {
+        await apiEliminar(pendingDeleteId);
+        if (pendingDeleteTr) {
+          pendingDeleteTr.classList.add('row-removing');
+          pendingDeleteTr.addEventListener('animationend', () => {
+            pendingDeleteTr.remove();
+            pendingDeleteTr = null;
+            clearSelection();
+          }, { once: true });
+        }
+        pendingDeleteId = null;
+      } catch (err) {
+        console.error('Error al eliminar:', err);
+      }
+    });
+
+    // ════════════════════════════════════════════════════
+    // RENDER DE FILAS
+    // ════════════════════════════════════════════════════
+    function agregarFilaTabla(row) {
+      const tr = document.createElement('tr');
+      tr.dataset.id = row.id;
+      tr.innerHTML = `
+        <td>${row.marca}</td>
+        <td>${row.sucursal}</td>
+        <td>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span>${row.aspirante}</span>
+            <div class="actions">
+              <img src="Assets/icon_editar1.svg"   alt="Editar"   class="btn-editar"/>
+              <img src="Assets/icon_eliminar1.svg" alt="Eliminar" class="btn-eliminar"/>
+            </div>
+          </div>
+        </td>`;
+
+      bindDeleteBtn(tr);
+
+      tr.addEventListener('click', () => {
+        if (modoAgregar) salirModoAgregar();
+        if (selectedRow === tr) { clearSelection(); return; }
+        if (selectedRow) selectedRow.classList.remove('selected-row');
+        selectedRow   = tr;
+        selectedRowId = tr.dataset.id;
+        tr.classList.add('selected-row');
+        setTableIcons(tr);
+        llenarCampos(row);
+        activarIconos();
+        cardActions.classList.add('visible');
+      });
+
+      tbody.appendChild(tr);
+    }
+
+    // ── Carga inicial desde API ──
+    apiObtenerTodos().then(registros => {
+      if (registros) registros.forEach(agregarFilaTabla);
+    }).catch(err => console.error('Error al cargar registros:', err));
+
+  </script>
+
+</body>
+</html>
