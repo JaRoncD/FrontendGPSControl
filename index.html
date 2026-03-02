@@ -159,6 +159,8 @@
      horizontalmente en la parte inferior.
      z-index: 10 → siempre por encima de todo.
      Aparece con fadeUp simple (sin translate center).
+     pointer-events: auto → necesario para que los
+     clicks no sean bloqueados por capas superiores.
   ─────────────────────────────────────────── */
   .bottom-nav {
     position: fixed;
@@ -171,6 +173,7 @@
     gap: clamp(24px, 6vw, 100px);
     z-index: 10;
     opacity: 0;
+    pointer-events: auto;
     animation: fadeUpSimple 1.2s cubic-bezier(0.22,1,0.36,1) 1.2s forwards;
   }
   .bottom-nav a {
@@ -183,6 +186,7 @@
     text-decoration: none;
     white-space: nowrap;
     transition: opacity 0.2s;
+    pointer-events: auto; /* garantiza clickabilidad sobre cualquier capa */
   }
   .bottom-nav a:hover {
     opacity: 0.65;
