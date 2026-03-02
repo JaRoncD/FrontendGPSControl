@@ -578,8 +578,7 @@
       const payload = getFormValues();
       try {
         const nuevo = await apiCrear(payload);
-        console.log('Respuesta POST:', JSON.stringify(nuevo)); // ← agrega esto
-        if (nuevo) agregarFilaTabla(nuevo);
+        if (nuevo && nuevo.data) agregarFilaTabla(nuevo.data);
         salirModoAgregar();
       } catch (err) {
         console.error('Error al crear:', err);
@@ -657,7 +656,13 @@
         selectedRowId = tr.dataset.id;
         tr.classList.add('selected-row');
         setTableIcons(tr);
-        llenarCampos(row);
+        // Leer siempre del DOM para reflejar ediciones previas
+        const celdas = tr.querySelectorAll('td');
+        llenarCampos({
+          marca:     celdas[0].textContent.trim(),
+          sucursal:  celdas[1].textContent.trim(),
+          aspirante: celdas[2].querySelector('span').textContent.trim()
+        });
         activarIconos();
         cardActions.classList.add('visible');
       });
