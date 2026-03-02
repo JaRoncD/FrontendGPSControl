@@ -8,11 +8,6 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── BODY ──────────────────────────────────────
-       Layout de dos columnas iguales (1fr 1fr).
-       La tarjeta ocupa la izquierda y la tabla
-       la derecha. padding y gap dan el respiro visual.
-    ─────────────────────────────────────────────── */
     body {
       font-family: 'Montserrat', sans-serif;
       min-height: 100vh;
@@ -23,22 +18,13 @@
       gap: 24px;
     }
 
-    /* ── CENTRADO DE TARJETA ────────────────────────
-       Flexbox para centrar la card horizontalmente
-       dentro de su columna del grid.
-    ─────────────────────────────────────────────── */
     .card-wrapper {
       display: flex;
       justify-content: center;
       align-items: flex-start;
     }
 
-    /* ── TARJETA (CARD) ─────────────────────────────
-       Contenedor principal del formulario de edición.
-       transform: scale(1.2) → ampliación visual del 20%.
-       transform-origin: top center → crece hacia abajo.
-       transition permite animar el hover suavemente.
-    ─────────────────────────────────────────────── */
+    /* ── CARD ── */
     .card {
       width: 100%;
       max-width: 380px;
@@ -56,10 +42,6 @@
     }
     .card:hover { transform: scale(1.3); }
 
-    /* ── ÍCONO AGREGAR (+) ──────────────────────────
-       Posicionado en la esquina superior izquierda
-       de la tarjeta. Activa el modo agregar al click.
-    ─────────────────────────────────────────────── */
     .card-add {
       position: absolute;
       top: 14px; left: 14px;
@@ -69,21 +51,11 @@
     }
     .card-add:hover { transform: scale(1.2); }
 
-    /* ── FILA DE INPUT ──────────────────────────────
-       Cada fila contiene un ícono + un campo de texto.
-       gap: 14px da separación entre ícono e input.
-    ─────────────────────────────────────────────── */
     .card-row {
       display: flex;
       align-items: center;
       gap: 14px;
     }
-
-    /* ── ÍCONOS DE CAMPO ────────────────────────────
-       opacity: 0.4 estado inactivo (gris).
-       opacity: 1  estado activo (.activo).
-       Transición suave al cambiar de estado.
-    ─────────────────────────────────────────────── */
     .card-row img.row-icon {
       width: 28px; height: 28px;
       flex-shrink: 0;
@@ -92,11 +64,6 @@
     }
     .card-row img.row-icon.activo { opacity: 1; }
 
-    /* ── CAMPO DE TEXTO ─────────────────────────────
-       readonly por defecto (JS lo controla).
-       cursor: default cuando está bloqueado.
-       Estilos de foco y llenado con clases dinámicas.
-    ─────────────────────────────────────────────── */
     .card-input {
       flex: 1;
       border: 1.5px solid #e8e8e8;
@@ -107,19 +74,11 @@
       color: #aaa;
       background: #f7f7f7;
       outline: none;
-      transition: border 0.2s, background 0.2s;
-      cursor: default;
+      transition: border 0.2s;
     }
-    /* Estilo cuando el campo está habilitado para escribir */
-    .card-input.editable { cursor: text; }
-    .card-input.editable:focus  { border-color: #20c4d6; color: #555; }
-    .card-input.filled          { color: #555; background: #fff; border-color: #e0e0e0; }
+    .card-input:focus  { border-color: #20c4d6; color: #555; }
+    .card-input.filled { color: #555; background: #fff; border-color: #e0e0e0; }
 
-    /* ── BOTONES MODO EDICIÓN ───────────────────────
-       Ocultos por defecto (opacity: 0, height: 0).
-       Se muestran al seleccionar una fila (.visible).
-       Contiene los íconos de cancelar y confirmar.
-    ─────────────────────────────────────────────── */
     .card-actions {
       display: flex;
       justify-content: flex-end;
@@ -138,10 +97,6 @@
     }
     .card-actions img:hover { transform: scale(1.15); }
 
-    /* ── BOTONES MODO AGREGAR ───────────────────────
-       Ocultos por defecto. Visibles al activar el
-       modo agregar (icono + clicked). Centrados.
-    ─────────────────────────────────────────────── */
     .card-actions-crear {
       display: flex;
       justify-content: center;
@@ -154,10 +109,6 @@
     }
     .card-actions-crear.visible { opacity: 1; pointer-events: all; height: auto; overflow: visible; }
 
-    /* ── BOTONES CANCELAR / CREAR ───────────────────
-       Estilo de botón de texto con borde de color.
-       Cancelar: borde rosa. Crear: borde cyan.
-    ─────────────────────────────────────────────── */
     .btn-cancelar-crear, .btn-crear {
       font-family: 'Montserrat', sans-serif;
       font-size: 13px;
@@ -172,11 +123,7 @@
     .btn-crear { color: #20c4d6; border: 1.5px solid #20c4d6; }
     .btn-crear:hover { background: #f0fbfc; }
 
-    /* ── MODALES ────────────────────────────────────
-       Overlay semitransparente con blur de fondo.
-       display: none por defecto → flex al mostrar.
-       z-index: 999 → siempre encima de todo.
-    ─────────────────────────────────────────────── */
+    /* ── MODALES ── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -189,10 +136,6 @@
     }
     .modal-overlay.show { display: flex; }
 
-    /* ── CAJA DEL MODAL ─────────────────────────────
-       Tarjeta centrada con animación de entrada.
-       max-width: 340px mantiene el modal compacto.
-    ─────────────────────────────────────────────── */
     .modal-box {
       background: #fff;
       border-radius: 18px;
@@ -233,20 +176,13 @@
     .modal-btn-danger  { background: #E280BE; color: #fff; }
     .modal-btn-danger:hover  { background: #d06aaa; }
 
-    /* ── CENTRADO DE TABLA ──────────────────────────
-       Flexbox para centrar la tabla en su columna.
-    ─────────────────────────────────────────────── */
     .table-outer {
       display: flex;
       justify-content: center;
       align-items: flex-start;
     }
 
-    /* ── TABLA WRAPPER ──────────────────────────────
-       Contenedor visual de la tabla.
-       overflow: hidden → respeta el border-radius.
-       transform: scale(1.2) → mismo escalado que card.
-    ─────────────────────────────────────────────── */
+    /* ── TABLA ── */
     .table-wrapper {
       width: 100%;
       max-width: 600px;
@@ -257,24 +193,12 @@
       overflow: hidden;
       box-shadow: 0 4px 24px rgba(220,80,150,0.10);
     }
-
-    /* ── SCROLL DE TABLA ────────────────────────────
-       max-height limita la altura visible.
-       overflow-y: auto activa el scroll vertical.
-       Scrollbar personalizada en rosa.
-    ─────────────────────────────────────────────── */
     .table-scroll { max-height: 450px; overflow-y: auto; }
     .table-scroll::-webkit-scrollbar { width: 5px; }
     .table-scroll::-webkit-scrollbar-track { background: #fdf6fb; }
     .table-scroll::-webkit-scrollbar-thumb { background: #e8b0d0; border-radius: 10px; }
 
     table { width: 100%; border-collapse: collapse; }
-
-    /* ── ENCABEZADO DE TABLA ────────────────────────
-       Fondo rosa (#E280BE), texto blanco, centrado.
-       position: sticky + top: 0 → siempre visible
-       al hacer scroll. z-index: 1 sobre las filas.
-    ─────────────────────────────────────────────── */
     thead tr { background: #E280BE; }
     thead th {
       color: #fff;
@@ -293,10 +217,6 @@
     thead th:last-child  { border-right: none; }
     thead tr             { border-top: none; }
 
-    /* ── FILAS DE DATOS ─────────────────────────────
-       Separador inferior entre filas.
-       Hover y selección con fondos rosas distintos.
-    ─────────────────────────────────────────────── */
     tbody tr {
       border-bottom: 2px solid #f5d0e8;
       transition: background 0.2s;
@@ -314,10 +234,6 @@
       font-weight: 400;
     }
 
-    /* ── ÍCONOS DE ACCIÓN EN TABLA ──────────────────
-       Contenedor flex para íconos editar/eliminar.
-       Hover con escala para feedback visual.
-    ─────────────────────────────────────────────── */
     .actions { display: flex; align-items: center; gap: 10px; }
     .actions img {
       width: 26px; height: 26px;
@@ -326,11 +242,6 @@
     }
     .actions img:hover { transform: scale(1.15); }
 
-    /* ── ANIMACIÓN ELIMINAR FILA ────────────────────
-       La fila se encoge verticalmente (scaleY 1→0)
-       mientras desaparece (opacity 1→0).
-       pointer-events: none evita clicks durante la animación.
-    ─────────────────────────────────────────────── */
     @keyframes fadeOutRow {
       0%   { opacity: 1; transform: scaleY(1); max-height: 100px; }
       100% { opacity: 0; transform: scaleY(0); max-height: 0; padding: 0; }
@@ -342,10 +253,7 @@
       pointer-events: none;
     }
 
-    /* ── FOOTER ─────────────────────────────────────
-       Fijo en la parte inferior centrado.
-       Siempre visible por encima del contenido.
-    ─────────────────────────────────────────────── */
+    /* ── FOOTER ── */
     .footer {
       position: fixed;
       bottom: 0; left: 0;
@@ -361,38 +269,29 @@
 </head>
 <body>
 
-  <!-- ── TARJETA IZQUIERDA ──────────────────────────
-       Formulario de edición/creación de registros.
-       Contiene tres campos: Marca, Sucursal, Aspirante.
-       Los campos están bloqueados (readonly) por defecto
-       y se habilitan al activar modo editar o agregar.
-  ─────────────────────────────────────────────── -->
+  <!-- TARJETA IZQUIERDA -->
   <div class="card-wrapper">
   <div class="card" id="card">
-
-    <!-- Ícono + para activar modo agregar -->
     <img src="Assets/Icon_crear.svg" alt="Agregar" class="card-add" id="cardAdd" />
 
     <div class="card-row" style="margin-top:14px;">
       <img id="iconMarca" src="Assets/Icon_vehiculo.svg" alt="Marca" class="row-icon" />
-      <input class="card-input" id="inputMarca" type="text" placeholder="Marca" readonly />
+      <input class="card-input" id="inputMarca" type="text" placeholder="Marca" />
     </div>
     <div class="card-row">
       <img id="iconSucursal" src="Assets/Icon_puntoubicacion.svg" alt="Sucursal" class="row-icon" />
-      <input class="card-input" id="inputSucursal" type="text" placeholder="Sucursal" readonly />
+      <input class="card-input" id="inputSucursal" type="text" placeholder="Sucursal" />
     </div>
     <div class="card-row">
       <img id="iconAspirante" src="Assets/Icon_persona.svg" alt="Aspirante" class="row-icon" />
-      <input class="card-input" id="inputAspirante" type="text" placeholder="Aspirante" readonly />
+      <input class="card-input" id="inputAspirante" type="text" placeholder="Aspirante" />
     </div>
 
-    <!-- Botones modo edición: cancelar (X) y confirmar (✓) -->
     <div class="card-actions" id="cardActions">
       <img src="Assets/Icon_cancelar.svg"  alt="Cancelar"  id="btnCancelar" />
       <img src="Assets/Icon_confirmar.svg" alt="Confirmar" id="btnConfirmar" />
     </div>
 
-    <!-- Botones modo agregar: Cancelar y Crear -->
     <div class="card-actions-crear" id="cardActionsCrear">
       <button class="btn-cancelar-crear" id="btnCancelarCrear">Cancelar</button>
       <button class="btn-crear"          id="btnCrear">Crear</button>
@@ -400,14 +299,9 @@
   </div>
   </div>
 
-  <!-- ── TABLA DERECHA ──────────────────────────────
-       Encabezado fijo (fuera del scroll) + cuerpo
-       con scroll independiente. Dos tablas separadas
-       con colgroup para alinear columnas.
-  ─────────────────────────────────────────────── -->
+  <!-- TABLA DERECHA -->
   <div class="table-outer">
     <div class="table-wrapper">
-      <!-- Encabezado fijo — siempre visible -->
       <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
         <colgroup>
           <col style="width:28%"/>
@@ -422,7 +316,6 @@
           </tr>
         </thead>
       </table>
-      <!-- Cuerpo con scroll -->
       <div class="table-scroll">
         <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
           <colgroup>
@@ -436,10 +329,7 @@
     </div>
   </div>
 
-  <!-- ── MODAL: CAMPOS INCOMPLETOS ─────────────────
-       Se muestra al intentar crear o confirmar
-       con algún campo vacío.
-  ─────────────────────────────────────────────── -->
+  <!-- MODAL CAMPOS VACÍOS -->
   <div class="modal-overlay" id="modalVacio">
     <div class="modal-box">
       <div class="modal-icon">⚠️</div>
@@ -451,11 +341,7 @@
     </div>
   </div>
 
-  <!-- ── MODAL: CONFIRMAR ELIMINAR ─────────────────
-       Se muestra al hacer click en el ícono eliminar
-       de cualquier fila. Requiere confirmación
-       antes de ejecutar el DELETE en la API.
-  ─────────────────────────────────────────────── -->
+  <!-- MODAL CONFIRMAR ELIMINAR -->
   <div class="modal-overlay" id="modalEliminar">
     <div class="modal-box">
       <div class="modal-icon">🗑️</div>
@@ -468,9 +354,7 @@
     </div>
   </div>
 
-  <!-- ── PIE DE PÁGINA ─────────────────────────────
-       Logo fijo en la parte inferior centrado.
-  ─────────────────────────────────────────────── -->
+  <!-- PIE DE PÁGINA -->
   <footer class="footer">
     <img src="Assets/Imagologotipo_motion.svg" alt="Footer" class="footer-icon" />
   </footer>
@@ -479,20 +363,17 @@
 
     // ════════════════════════════════════════════════════
     // JWT — PROTECCIÓN DE PÁGINA
-    // Si no hay token en localStorage, redirige al login.
-    // Esto evita acceso directo a la tabla sin autenticación.
+    // Si no hay token, redirige al login
     // ════════════════════════════════════════════════════
     const token = localStorage.getItem('token');
     if (!token) window.location.href = 'login.html';
 
     // ════════════════════════════════════════════════════
     // CONFIGURACIÓN API
-    // URL base del backend Django en Render.
     // ════════════════════════════════════════════════════
     const API_BASE_URL = 'https://backendgpscontrol.onrender.com';
 
-    // ── Helper: headers con JWT ──────────────────────
-    // Incluye el token Bearer en cada petición autenticada.
+    // ── Helper: headers con JWT ──
     function authHeaders() {
       return {
         'Content-Type': 'application/json',
@@ -500,9 +381,7 @@
       };
     }
 
-    // ── Helper: manejar respuesta 401 ───────────────
-    // Si el token expiró o es inválido, limpia localStorage
-    // y redirige al login automáticamente.
+    // ── Helper: manejar respuesta 401 (token expirado) ──
     function handleUnauthorized(response) {
       if (response.status === 401) {
         localStorage.removeItem('token');
@@ -515,8 +394,6 @@
 
     // ════════════════════════════════════════════════════
     // FUNCIONES API (CRUD) — CON JWT
-    // Cada función envía el token en el header Authorization.
-    // handleUnauthorized redirige al login si el token expira.
     // ════════════════════════════════════════════════════
 
     // READ → GET /api/registros/
@@ -531,7 +408,6 @@
 
     // CREATE → POST /api/registros/
     // payload = { marca, sucursal, aspirante }
-    // Retorna: { message, data: { id, marca, sucursal, aspirante } }
     async function apiCrear(payload) {
       const response = await fetch(`${API_BASE_URL}/api/registros/`, {
         method: 'POST',
@@ -567,8 +443,7 @@
       return true;
     }
 
-    // ── Cerrar sesión ────────────────────────────────
-    // Limpia los tokens del localStorage y redirige al login.
+    // ── Cerrar sesión ──
     function logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('refresh');
@@ -605,60 +480,22 @@
       { el: iconAspirante, def: 'Assets/Icon_persona.svg',        act: 'Assets/Icon_persona1.svg'        },
     ];
 
-    // ── Variables de estado ──────────────────────────
-    let selectedRow     = null;  // TR actualmente seleccionado
-    let selectedRowId   = null;  // ID del registro seleccionado (para PUT/DELETE)
-    let modoAgregar     = false; // true cuando el usuario está creando un nuevo registro
-    let pendingDeleteTr = null;  // TR pendiente de eliminar (esperando confirmación modal)
-    let pendingDeleteId = null;  // ID del registro pendiente de eliminar
+    let selectedRow     = null;
+    let selectedRowId   = null;
+    let modoAgregar     = false;
+    let pendingDeleteTr = null;
+    let pendingDeleteId = null;
 
     // ════════════════════════════════════════════════════
     // HELPERS UI
     // ════════════════════════════════════════════════════
+    function activarIconos()    { allIcons.forEach(({ el, act }) => { el.src = act; el.classList.add('activo'); }); }
+    function desactivarIconos() { allIcons.forEach(({ el, def }) => { el.src = def; el.classList.remove('activo'); }); }
+    function limpiarCampos()    { allInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); }); }
+    function camposValidos()    { return allInputs.every(inp => inp.value.trim() !== ''); }
+    function showModal(el)      { el.classList.add('show'); }
+    function hideModal(el)      { el.classList.remove('show'); }
 
-    // Activa los íconos de la tarjeta (estado lleno/coloreado)
-    function activarIconos() {
-      allIcons.forEach(({ el, act }) => { el.src = act; el.classList.add('activo'); });
-    }
-
-    // Restaura los íconos al estado inactivo (opacidad reducida)
-    function desactivarIconos() {
-      allIcons.forEach(({ el, def }) => { el.src = def; el.classList.remove('activo'); });
-    }
-
-    // Limpia todos los campos y quita la clase filled
-    function limpiarCampos() {
-      allInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); });
-    }
-
-    // Habilita escritura en los campos (modo editar o agregar)
-    function habilitarCampos() {
-      allInputs.forEach(inp => {
-        inp.removeAttribute('readonly');
-        inp.classList.add('editable');
-      });
-    }
-
-    // Bloquea escritura en los campos (estado por defecto)
-    function bloquearCampos() {
-      allInputs.forEach(inp => {
-        inp.setAttribute('readonly', true);
-        inp.classList.remove('editable');
-      });
-    }
-
-    // Valida que todos los campos tengan contenido
-    function camposValidos() {
-      return allInputs.every(inp => inp.value.trim() !== '');
-    }
-
-    // Muestra un modal agregando la clase .show
-    function showModal(el) { el.classList.add('show'); }
-
-    // Oculta un modal quitando la clase .show
-    function hideModal(el) { el.classList.remove('show'); }
-
-    // Rellena los campos de la tarjeta con los datos de una fila
     function llenarCampos(row) {
       inputMarca.value     = row.marca;
       inputSucursal.value  = row.sucursal;
@@ -666,7 +503,6 @@
       allInputs.forEach(inp => inp.classList.add('filled'));
     }
 
-    // Obtiene los valores actuales del formulario como objeto
     function getFormValues() {
       return {
         marca:     inputMarca.value.trim(),
@@ -675,8 +511,6 @@
       };
     }
 
-    // ── Bind botón eliminar de una fila ─────────────
-    // Se llama al crear o regenerar íconos de una fila.
     function bindDeleteBtn(tr) {
       tr.querySelector('.btn-eliminar').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -686,9 +520,6 @@
       });
     }
 
-    // ── Actualizar íconos de tabla al seleccionar fila ──
-    // La fila activa muestra íconos activos (coloreados).
-    // El resto muestra íconos inactivos (apagados).
     function setTableIcons(activeTr) {
       document.querySelectorAll('#tableBody tr').forEach(tr => {
         const imgs = tr === activeTr
@@ -701,8 +532,6 @@
       });
     }
 
-    // ── Restaurar todos los íconos de tabla al estado activo ──
-    // Se llama al deseleccionar una fila (clearSelection).
     function restoreTableIcons() {
       document.querySelectorAll('#tableBody tr').forEach(tr => {
         tr.querySelector('.actions').innerHTML =
@@ -712,24 +541,18 @@
       });
     }
 
-    // ── Deseleccionar fila y resetear estado de la tarjeta ──
-    // Quita la selección visual, limpia campos, bloquea inputs.
     function clearSelection() {
       if (selectedRow) { selectedRow.classList.remove('selected-row'); selectedRow = null; }
       selectedRowId = null;
       restoreTableIcons();
       limpiarCampos();
-      bloquearCampos();
       desactivarIconos();
       cardActions.classList.remove('visible');
     }
 
-    // ── Salir del modo agregar ───────────────────────
-    // Resetea el estado del formulario y bloquea los inputs.
     function salirModoAgregar() {
       modoAgregar = false;
       limpiarCampos();
-      bloquearCampos();
       desactivarIconos();
       cardActionsCrear.classList.remove('visible');
     }
@@ -738,48 +561,48 @@
     // ACCIONES CRUD
     // ════════════════════════════════════════════════════
 
-    // ── AGREGAR — click en ícono + ───────────────────
-    // Activa el modo agregar: habilita campos y muestra
-    // los botones Cancelar/Crear. Si ya estaba activo, cancela.
+    // ── AGREGAR (icono +) ──
     cardAdd.addEventListener('click', () => {
       if (modoAgregar) { salirModoAgregar(); return; }
       clearSelection();
       modoAgregar = true;
-      habilitarCampos();
       activarIconos();
       cardActionsCrear.classList.add('visible');
     });
 
     btnCancelarCrear.addEventListener('click', salirModoAgregar);
 
-    // ── CREAR — POST /api/registros/ ─────────────────
-    // Valida campos, envía el payload a la API y agrega
-    // la nueva fila usando los datos retornados en nuevo.data.
+    // ── CREAR (POST) ──
     btnCrear.addEventListener('click', async () => {
       if (!camposValidos()) { showModal(modalVacio); return; }
       const payload = getFormValues();
       try {
         const nuevo = await apiCrear(payload);
-        // La API retorna { message, data: { id, marca, sucursal, aspirante } }
-        if (nuevo && nuevo.data) agregarFilaTabla(nuevo.data);
+        console.log('Respuesta POST completa:', JSON.stringify(nuevo));
+        console.log('nuevo.data:', nuevo.data);
+        console.log('marca:', nuevo.data ? nuevo.data.marca : 'SIN DATA');
+        console.log('sucursal:', nuevo.data ? nuevo.data.sucursal : 'SIN DATA');
+        console.log('aspirante:', nuevo.data ? nuevo.data.aspirante : 'SIN DATA');
+        if (nuevo && nuevo.data) {
+          agregarFilaTabla(nuevo.data);
+          console.log('agregarFilaTabla llamada con:', JSON.stringify(nuevo.data));
+        } else {
+          console.log('nuevo.data es undefined, claves recibidas:', Object.keys(nuevo));
+        }
         salirModoAgregar();
       } catch (err) {
         console.error('Error al crear:', err);
       }
     });
 
-    // ── CANCELAR EDICIÓN ─────────────────────────────
+    // ── MODIFICAR (PUT) ──
     btnCancelar.addEventListener('click', clearSelection);
 
-    // ── MODIFICAR — PUT /api/registros/:id/ ──────────
-    // Valida campos, envía el payload y actualiza el DOM
-    // directamente para evitar un GET adicional.
     btnConfirmar.addEventListener('click', async () => {
       if (!camposValidos()) { showModal(modalVacio); return; }
       const payload = getFormValues();
       try {
         await apiActualizar(selectedRowId, payload);
-        // Actualizar DOM directamente sin recargar
         if (selectedRow) {
           const celdas = selectedRow.querySelectorAll('td');
           celdas[0].textContent = payload.marca;
@@ -792,18 +615,15 @@
       }
     });
 
-    // ── ELIMINAR — DELETE /api/registros/:id/ ────────
+    // ── ELIMINAR (DELETE) ──
     modalVacioOk.addEventListener('click',    () => hideModal(modalVacio));
     modalEliminarNo.addEventListener('click', () => hideModal(modalEliminar));
 
-    // Al confirmar eliminar: llama a la API y anima la fila
-    // antes de removerla del DOM.
     modalEliminarSi.addEventListener('click', async () => {
       hideModal(modalEliminar);
       try {
         await apiEliminar(pendingDeleteId);
         if (pendingDeleteTr) {
-          // Animación de salida antes de eliminar del DOM
           pendingDeleteTr.classList.add('row-removing');
           pendingDeleteTr.addEventListener('animationend', () => {
             pendingDeleteTr.remove();
@@ -819,15 +639,10 @@
 
     // ════════════════════════════════════════════════════
     // RENDER DE FILAS
-    // Crea un TR con los datos del registro y le asigna
-    // los eventos de click y eliminar.
-    // tr.dataset.id guarda el ID para operaciones API.
-    // Los campos se leen del DOM al hacer click para
-    // reflejar siempre los valores más recientes.
     // ════════════════════════════════════════════════════
     function agregarFilaTabla(row) {
       const tr = document.createElement('tr');
-      tr.dataset.id = row.id; // ID usado en PUT y DELETE
+      tr.dataset.id = row.id;
       tr.innerHTML = `
         <td>${row.marca}</td>
         <td>${row.sucursal}</td>
@@ -843,7 +658,6 @@
 
       bindDeleteBtn(tr);
 
-      // Click en fila → activa modo edición
       tr.addEventListener('click', () => {
         if (modoAgregar) salirModoAgregar();
         if (selectedRow === tr) { clearSelection(); return; }
@@ -852,14 +666,13 @@
         selectedRowId = tr.dataset.id;
         tr.classList.add('selected-row');
         setTableIcons(tr);
-        // Leer del DOM para reflejar ediciones previas sin recargar
+        // Leer siempre del DOM para reflejar ediciones previas
         const celdas = tr.querySelectorAll('td');
         llenarCampos({
           marca:     celdas[0].textContent.trim(),
           sucursal:  celdas[1].textContent.trim(),
           aspirante: celdas[2].querySelector('span').textContent.trim()
         });
-        habilitarCampos(); // habilitar escritura al seleccionar fila
         activarIconos();
         cardActions.classList.add('visible');
       });
@@ -867,10 +680,7 @@
       tbody.appendChild(tr);
     }
 
-    // ── Carga inicial desde API ──────────────────────
-    // Al cargar la página obtiene todos los registros
-    // y los renderiza en la tabla.
-    // Para conectar: ya está activo, solo ajusta la URL.
+    // ── Carga inicial desde API ──
     apiObtenerTodos().then(registros => {
       if (registros) registros.forEach(agregarFilaTabla);
     }).catch(err => console.error('Error al cargar registros:', err));
