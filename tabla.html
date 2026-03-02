@@ -523,8 +523,8 @@
     function setTableIcons(activeTr) {
       document.querySelectorAll('#tableBody tr').forEach(tr => {
         const imgs = tr === activeTr
-          ? ['Assets/Icon_editar1.svg',  'Assets/Icon_eliminar1.svg']
-          : ['Assets/Icon_editar.svg',   'Assets/Icon_eliminar.svg'];
+          ? ['Assets/icon_editar1.svg',  'Assets/Icon_eliminar1.svg']
+          : ['Assets/icon_editar.svg',   'Assets/Icon_eliminar.svg'];
         tr.querySelector('.actions').innerHTML =
           `<img src="${imgs[0]}" alt="Editar"   class="btn-editar"/>
            <img src="${imgs[1]}" alt="Eliminar" class="btn-eliminar"/>`;
@@ -535,8 +535,8 @@
     function restoreTableIcons() {
       document.querySelectorAll('#tableBody tr').forEach(tr => {
         tr.querySelector('.actions').innerHTML =
-          `<img src="Assets/Icon_editar1.svg"   alt="Editar"   class="btn-editar"/>
-           <img src="Assets/Icon_eliminar1.svg" alt="Eliminar" class="btn-eliminar"/>`;
+          `<img src="Assets/icon_editar1.svg"   alt="Editar"   class="btn-editar"/>
+           <img src="Assets/icon_eliminar1.svg" alt="Eliminar" class="btn-eliminar"/>`;
         bindDeleteBtn(tr);
       });
     }
@@ -578,7 +578,17 @@
       const payload = getFormValues();
       try {
         const nuevo = await apiCrear(payload);
-        if (nuevo && nuevo.data) agregarFilaTabla(nuevo.data);
+        console.log('Respuesta POST completa:', JSON.stringify(nuevo));
+        console.log('nuevo.data:', nuevo.data);
+        console.log('marca:', nuevo.data ? nuevo.data.marca : 'SIN DATA');
+        console.log('sucursal:', nuevo.data ? nuevo.data.sucursal : 'SIN DATA');
+        console.log('aspirante:', nuevo.data ? nuevo.data.aspirante : 'SIN DATA');
+        if (nuevo && nuevo.data) {
+          agregarFilaTabla(nuevo.data);
+          console.log('agregarFilaTabla llamada con:', JSON.stringify(nuevo.data));
+        } else {
+          console.log('nuevo.data es undefined, claves recibidas:', Object.keys(nuevo));
+        }
         salirModoAgregar();
       } catch (err) {
         console.error('Error al crear:', err);
@@ -640,8 +650,8 @@
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span>${row.aspirante}</span>
             <div class="actions">
-              <img src="Assets/Icon_editar1.svg"   alt="Editar"   class="btn-editar"/>
-              <img src="Assets/Icon_eliminar1.svg" alt="Eliminar" class="btn-eliminar"/>
+              <img src="Assets/icon_editar1.svg"   alt="Editar"   class="btn-editar"/>
+              <img src="Assets/icon_eliminar1.svg" alt="Eliminar" class="btn-eliminar"/>
             </div>
           </div>
         </td>`;
